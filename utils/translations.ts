@@ -1,0 +1,208 @@
+import { Translations } from "../types";
+
+export const languages = {
+  en: { name: 'English', flag: '🇬🇧', dir: 'ltr', font: 'font-inter' as const },
+  ar: { name: 'Arabic', flag: '🇸🇦', dir: 'rtl', font: 'font-cairo' as const },
+  tr: { name: 'Turkish', flag: '🇹🇷', dir: 'ltr', font: 'font-inter' as const },
+  pl: { name: 'Polish', flag: '🇵🇱', dir: 'ltr', font: 'font-inter' as const },
+  ro: { name: 'Romanian', flag: '🇷🇴', dir: 'ltr', font: 'font-inter' as const },
+  fa: { name: 'Persian', flag: '🇮🇷', dir: 'rtl', font: 'font-cairo' as const },
+  ps: { name: 'Pashto', flag: '🇦🇫', dir: 'rtl', font: 'font-cairo' as const },
+  it: { name: 'Italian', flag: '🇮🇹', dir: 'ltr', font: 'font-inter' as const },
+  es: { name: 'Spanish', flag: '🇪🇸', dir: 'ltr', font: 'font-inter' as const },
+  ru: { name: 'Russian', flag: '🇷🇺', dir: 'ltr', font: 'font-inter' as const },
+  uk: { name: 'Ukrainian', flag: '🇺🇦', dir: 'ltr', font: 'font-inter' as const },
+  fr: { name: 'French', flag: '🇫🇷', dir: 'ltr', font: 'font-inter' as const },
+  nl: { name: 'Dutch', flag: '🇳🇱', dir: 'ltr', font: 'font-inter' as const },
+};
+
+export type LanguageCode = keyof typeof languages;
+
+type TranslationMap = {
+    [key in LanguageCode]: Translations;
+}
+
+export const translations: TranslationMap = {
+    en: {
+        languageName: 'English', dir: 'ltr', font: 'font-inter',
+        title: 'German Millionaire', subtitle: 'Test your German skills!',
+        startGame: 'Start Game', playAgain: 'Play Again',
+        generatingQuestions: 'Generating Questions...', loadingNextQuestion: 'Loading next question...',
+        congratulations: 'Congratulations!', gameOver: 'Game Over',
+        winMessage: "You've won the grand prize!", loseMessage: (q) => `You answered ${q} questions correctly.`,
+        correctAnswerWas: 'The correct answer was:',
+        audiencePoll: 'Audience Poll', pollingAudience: 'Polling the audience...',
+        phoneAFriend: 'Phone a Friend', friendThinking: 'Calling a friend...', friendAnswer: "I'm pretty sure the answer is...",
+        selectLanguage: 'Select a language for translations',
+        selectDifficulty: 'Select Difficulty Level',
+        difficultyLevels: { A1: 'Very Easy', A2: 'Easy', B1: 'Difficult', B2: 'Harder' }
+    },
+    ar: {
+        languageName: 'Arabic', dir: 'rtl', font: 'font-cairo',
+        title: 'المليونير الألماني', subtitle: 'اختبر مهاراتك في اللغة الألمانية!',
+        startGame: 'ابدأ اللعبة', playAgain: 'العب مرة أخرى',
+        generatingQuestions: 'جاري إنشاء الأسئلة...', loadingNextQuestion: 'جاري تحميل السؤال التالي...',
+        congratulations: 'تهانينا!', gameOver: 'انتهت اللعبة',
+        winMessage: 'لقد فزت بالجائزة الكبرى!', loseMessage: (q) => `لقد أجبت على ${q} أسئلة بشكل صحيح.`,
+        correctAnswerWas: 'كانت الإجابة الصحيحة:',
+        audiencePoll: 'استطلاع الجمهور', pollingAudience: 'جاري سؤال الجمهور...',
+        phoneAFriend: 'اتصل بصديق', friendThinking: 'جاري الاتصال بصديق...', friendAnswer: 'أنا متأكد تمامًا أن الإجابة هي...',
+        selectLanguage: 'اختر لغة للترجمة',
+        selectDifficulty: 'اختر مستوى الصعوبة',
+        difficultyLevels: { A1: 'سهل جداً', A2: 'سهل', B1: 'صعب', B2: 'أصعب' }
+    },
+    tr: {
+        languageName: 'Turkish', dir: 'ltr', font: 'font-inter',
+        title: 'Alman Milyoner', subtitle: 'Almanca becerilerinizi test edin!',
+        startGame: 'Oyuna Başla', playAgain: 'Tekrar Oyna',
+        generatingQuestions: 'Sorular Oluşturuluyor...', loadingNextQuestion: 'Sonraki soru yükleniyor...',
+        congratulations: 'Tebrikler!', gameOver: 'Oyun Bitti',
+        winMessage: 'Büyük ödülü kazandınız!', loseMessage: (q) => `${q} soruyu doğru cevapladınız.`,
+        correctAnswerWas: 'Doğru cevap şuydu:',
+        audiencePoll: 'Seyirci Oylaması', pollingAudience: 'Seyircilere soruluyor...',
+        phoneAFriend: 'Arkadaşını Ara', friendThinking: 'Arkadaş aranıyor...', friendAnswer: 'Cevabın bu olduğundan oldukça eminim...',
+        selectLanguage: 'Çeviriler için bir dil seçin',
+        selectDifficulty: 'Zorluk Seviyesini Seçin',
+        difficultyLevels: { A1: 'Çok Kolay', A2: 'Kolay', B1: 'Zor', B2: 'Daha Zor' }
+    },
+    pl: {
+        languageName: 'Polish', dir: 'ltr', font: 'font-inter',
+        title: 'Niemiecki Milioner', subtitle: 'Sprawdź swoje umiejętności z niemieckiego!',
+        startGame: 'Rozpocznij Grę', playAgain: 'Zagraj Ponownie',
+        generatingQuestions: 'Generowanie Pytań...', loadingNextQuestion: 'Ładowanie następnego pytania...',
+        congratulations: 'Gratulacje!', gameOver: 'Koniec Gry',
+        winMessage: 'Wygrałeś główną nagrodę!', loseMessage: (q) => `Odpowiedziałeś poprawnie na ${q} pytań.`,
+        correctAnswerWas: 'Prawidłowa odpowiedź to:',
+        audiencePoll: 'Głosowanie Publiczności', pollingAudience: 'Pytanie do publiczności...',
+        phoneAFriend: 'Telefon do Przyjaciela', friendThinking: 'Dzwonienie do przyjaciela...', friendAnswer: 'Jestem prawie pewien, że odpowiedź to...',
+        selectLanguage: 'Wybierz język do tłumaczeń',
+        selectDifficulty: 'Wybierz Poziom Trudności',
+        difficultyLevels: { A1: 'Bardzo Łatwy', A2: 'Łatwy', B1: 'Trudny', B2: 'Trudniejszy' }
+    },
+    ro: {
+        languageName: 'Romanian', dir: 'ltr', font: 'font-inter',
+        title: 'Milionarul German', subtitle: 'Testează-ți cunoștințele de germană!',
+        startGame: 'Începe Jocul', playAgain: 'Joacă Din Nou',
+        generatingQuestions: 'Se generează întrebări...', loadingNextQuestion: 'Se încarcă următoarea întrebare...',
+        congratulations: 'Felicitări!', gameOver: 'Joc Terminat',
+        winMessage: 'Ai câștigat marele premiu!', loseMessage: (q) => `Ai răspuns corect la ${q} întrebări.`,
+        correctAnswerWas: 'Răspunsul corect a fost:',
+        audiencePoll: 'Sondaj Public', pollingAudience: 'Se întreabă publicul...',
+        phoneAFriend: 'Sună un Prieten', friendThinking: 'Se sună un prieten...', friendAnswer: 'Sunt destul de sigur că răspunsul este...',
+        selectLanguage: 'Selectează o limbă pentru traduceri',
+        selectDifficulty: 'Selectează Nivelul de Dificultate',
+        difficultyLevels: { A1: 'Foarte Ușor', A2: 'Ușor', B1: 'Dificil', B2: 'Mai Dificil' }
+    },
+    fa: {
+        languageName: 'Persian', dir: 'rtl', font: 'font-cairo',
+        title: 'میلیونر آلمانی', subtitle: 'مهارت های آلمانی خود را بیازمایید!',
+        startGame: 'شروع بازی', playAgain: 'بازی دوباره',
+        generatingQuestions: 'در حال ایجاد سوالات...', loadingNextQuestion: 'در حال بارگذاری سوال بعدی...',
+        congratulations: 'تبریک میگم!', gameOver: 'بازی تمام شد',
+        winMessage: 'شما برنده جایزه بزرگ شدید!', loseMessage: (q) => `شما به ${q} سوال به درستی پاسخ دادید.`,
+        correctAnswerWas: 'پاسخ صحیح این بود:',
+        audiencePoll: 'نظرسنجی تماشاگران', pollingAudience: 'در حال پرسیدن از تماشاگران...',
+        phoneAFriend: 'تماس با یک دوست', friendThinking: 'در حال تماس با یک دوست...', friendAnswer: 'من کاملاً مطمئنم که جواب این است...',
+        selectLanguage: 'یک زبان برای ترجمه انتخاب کنید',
+        selectDifficulty: 'سطح دشواری را انتخاب کنید',
+        difficultyLevels: { A1: 'بسیار آسان', A2: 'آسان', B1: 'دشوار', B2: 'دشوارتر' }
+    },
+    ps: {
+        languageName: 'Pashto', dir: 'rtl', font: 'font-cairo',
+        title: 'جرمن میلیونر', subtitle: 'خپل جرمن مهارتونه وازمایئ!',
+        startGame: 'لوبه پیل کړئ', playAgain: 'بیا لوبه وکړئ',
+        generatingQuestions: 'پوښتنې جوړیږي...', loadingNextQuestion: 'بله پوښتنه پورته کیږي...',
+        congratulations: 'مبارک شه!', gameOver: 'لوبه پای ته ورسېده',
+        winMessage: 'تاسو لویه جایزه وګټله!', loseMessage: (q) => `تاسو ${q} پوښتنو ته سم ځواب ورکړ.`,
+        correctAnswerWas: 'سم ځواب دا وو:',
+        audiencePoll: 'د لیدونکو رایه', pollingAudience: 'له لیدونکو څخه پوښتنه کیږي...',
+        phoneAFriend: 'ملګري ته زنګ ووهئ', friendThinking: 'ملګري ته زنګ وهل کیږي...', friendAnswer: 'زه پوره ډاډه یم چې ځواب دا دی...',
+        selectLanguage: 'د ژباړې لپاره یوه ژبه وټاکئ',
+        selectDifficulty: 'د ستونزې کچه وټاکئ',
+        difficultyLevels: { A1: 'ډیر اسانه', A2: 'اسانه', B1: 'ستونزمن', B2: 'ډیر ستونزمن' }
+    },
+    it: {
+        languageName: 'Italian', dir: 'ltr', font: 'font-inter',
+        title: 'Milionario Tedesco', subtitle: 'Metti alla prova le tue abilità di tedesco!',
+        startGame: 'Inizia Partita', playAgain: 'Gioca Ancora',
+        generatingQuestions: 'Generazione Domande...', loadingNextQuestion: 'Caricamento prossima domanda...',
+        congratulations: 'Congratulazioni!', gameOver: 'Fine Partita',
+        winMessage: 'Hai vinto il primo premio!', loseMessage: (q) => `Hai risposto correttamente a ${q} domande.`,
+        correctAnswerWas: 'La risposta corretta era:',
+        audiencePoll: 'Sondaggio del Pubblico', pollingAudience: 'Interpellando il pubblico...',
+        phoneAFriend: 'Chiama un Amico', friendThinking: 'Chiamando un amico...', friendAnswer: 'Sono abbastanza sicuro che la risposta sia...',
+        selectLanguage: 'Seleziona una lingua per le traduzioni',
+        selectDifficulty: 'Seleziona Livello di Difficoltà',
+        difficultyLevels: { A1: 'Molto Facile', A2: 'Facile', B1: 'Difficile', B2: 'Più Difficile' }
+    },
+    es: {
+        languageName: 'Spanish', dir: 'ltr', font: 'font-inter',
+        title: 'Millonario Alemán', subtitle: '¡Pon a prueba tus habilidades de alemán!',
+        startGame: 'Empezar Juego', playAgain: 'Jugar de Nuevo',
+        generatingQuestions: 'Generando Preguntas...', loadingNextQuestion: 'Cargando siguiente pregunta...',
+        congratulations: '¡Felicidades!', gameOver: 'Juego Terminado',
+        winMessage: '¡Has ganado el gran premio!', loseMessage: (q) => `Respondiste correctamente a ${q} preguntas.`,
+        correctAnswerWas: 'La respuesta correcta era:',
+        audiencePoll: 'Encuesta del Público', pollingAudience: 'Preguntando al público...',
+        phoneAFriend: 'Llamar a un Amigo', friendThinking: 'Llamando a un amigo...', friendAnswer: 'Estoy bastante seguro de que la respuesta es...',
+        selectLanguage: 'Selecciona un idioma para las traducciones',
+        selectDifficulty: 'Seleccionar Nivel de Dificultad',
+        difficultyLevels: { A1: 'Muy Fácil', A2: 'Fácil', B1: 'Difícil', B2: 'Más Difícil' }
+    },
+    ru: {
+        languageName: 'Russian', dir: 'ltr', font: 'font-inter',
+        title: 'Немецкий Миллионер', subtitle: 'Проверьте свои знания немецкого!',
+        startGame: 'Начать Игру', playAgain: 'Играть Снова',
+        generatingQuestions: 'Создание Вопросов...', loadingNextQuestion: 'Загрузка следующего вопроса...',
+        congratulations: 'Поздравляем!', gameOver: 'Игра Окончена',
+        winMessage: 'Вы выиграли главный приз!', loseMessage: (q) => `Вы правильно ответили на ${q} вопросов.`,
+        correctAnswerWas: 'Правильный ответ был:',
+        audiencePoll: 'Опрос Зала', pollingAudience: 'Опрос аудитории...',
+        phoneAFriend: 'Звонок Другу', friendThinking: 'Звонок другу...', friendAnswer: 'Я почти уверен, что ответ...',
+        selectLanguage: 'Выберите язык для переводов',
+        selectDifficulty: 'Выберите Уровень Сложности',
+        difficultyLevels: { A1: 'Очень Легко', A2: 'Легко', B1: 'Сложно', B2: 'Сложнее' }
+    },
+    uk: {
+        languageName: 'Ukrainian', dir: 'ltr', font: 'font-inter',
+        title: 'Німецький Мільйонер', subtitle: 'Перевірте свої знання німецької!',
+        startGame: 'Почати Гру', playAgain: 'Грати Знову',
+        generatingQuestions: 'Створення Запитань...', loadingNextQuestion: 'Завантаження наступного запитання...',
+        congratulations: 'Вітаємо!', gameOver: 'Гру Закінчено',
+        winMessage: 'Ви виграли головний приз!', loseMessage: (q) => `Ви правильно відповіли на ${q} запитань.`,
+        correctAnswerWas: 'Правильна відповідь була:',
+        audiencePoll: 'Опитування Глядачів', pollingAudience: 'Опитування аудиторії...',
+        phoneAFriend: 'Дзвінок Другу', friendThinking: 'Дзвінок другу...', friendAnswer: 'Я майже впевнений, що відповідь...',
+        selectLanguage: 'Виберіть мову для перекладів',
+        selectDifficulty: 'Виберіть Рівень Складності',
+        difficultyLevels: { A1: 'Дуже Легко', A2: 'Легко', B1: 'Складно', B2: 'Складніше' }
+    },
+    fr: {
+        languageName: 'French', dir: 'ltr', font: 'font-inter',
+        title: 'Millionnaire Allemand', subtitle: 'Testez vos compétences en allemand !',
+        startGame: 'Commencer le Jeu', playAgain: 'Rejouer',
+        generatingQuestions: 'Génération des Questions...', loadingNextQuestion: 'Chargement de la question suivante...',
+        congratulations: 'Félicitations !', gameOver: 'Partie Terminée',
+        winMessage: 'Vous avez gagné le grand prix !', loseMessage: (q) => `Vous avez répondu correctly à ${q} questions.`,
+        correctAnswerWas: 'La bonne réponse était :',
+        audiencePoll: "Sondage de l'Audience", pollingAudience: "Sondage de l'audience...",
+        phoneAFriend: 'Appeler un Ami', friendThinking: "Appel d'un ami...", friendAnswer: 'Je suis presque sûr que la réponse est...',
+        selectLanguage: 'Sélectionnez une langue pour les traductions',
+        selectDifficulty: 'Sélectionnez le Niveau de Difficulté',
+        difficultyLevels: { A1: 'Très Facile', A2: 'Facile', B1: 'Difficile', B2: 'Plus Difficile' }
+    },
+    nl: {
+        languageName: 'Dutch', dir: 'ltr', font: 'font-inter',
+        title: 'Duitse Miljonair', subtitle: 'Test je Duitse vaardigheden!',
+        startGame: 'Start Spel', playAgain: 'Opnieuw Spelen',
+        generatingQuestions: 'Vragen genereren...', loadingNextQuestion: 'Volgende vraag laden...',
+        congratulations: 'Gefeliciteerd!', gameOver: 'Spel Voorbij',
+        winMessage: 'Je hebt de hoofdprijs gewonnen!', loseMessage: (q) => `Je hebt ${q} vragen correct beantwoord.`,
+        correctAnswerWas: 'Het juiste antwoord was:',
+        audiencePoll: 'Publiekspeiling', pollingAudience: 'Het publiek wordt geraadpleegd...',
+        phoneAFriend: 'Bel een Vriend', friendThinking: 'Een vriend bellen...', friendAnswer: 'Ik ben er vrij zeker van dat het antwoord is...',
+        selectLanguage: 'Selecteer een taal voor vertalingen',
+        selectDifficulty: 'Selecteer Moeilijkheidsgraad',
+        difficultyLevels: { A1: 'Heel Makkelijk', A2: 'Makkelijk', B1: 'Moeilijk', B2: 'Moeilijker' }
+    }
+};
