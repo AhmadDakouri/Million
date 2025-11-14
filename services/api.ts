@@ -1,5 +1,34 @@
-export const sendMessageToDeepSeek = async (message: string): Promise<string> => {
+/**
+ * Generate German quiz questions using DeepSeek API
+ * @param level Language level (A1, A2, B1, B2)
+ * @param count Number of questions to generate
+ */
+export const generateGermanQuizQuestions = async (
+  level: string = 'A1', 
+  count: number = 5
+): Promise<any[]> => {
   const apiKey = "sk-1fa9e391bb76492ab755ec0bb7ad378c";
+
+  const prompt = `
+Generate ${count} German language multiple-choice questions for ${level} level.
+Return ONLY a JSON array without any other text.
+
+Format each question like this:
+{
+  "question": "Question text in German",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "correctAnswer": 0,
+  "explanation": "Explanation in English"
+}
+
+Make questions about:
+- Vocabulary
+- Grammar  
+- Common phrases
+- German culture
+
+Difficulty: ${level} level
+  `;
 
   try {
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -12,32 +41,34 @@ export const sendMessageToDeepSeek = async (message: string): Promise<string> =>
         model: 'deepseek-chat',
         messages: [
           {
-            role: 'user',  // ⚠️ غيرت من system إلى user
-            content: message,
+            role: 'user',
+            content: prompt,
           },
         ],
-        max_tokens: 1000,
+        max_tokens: 2000,
         temperature: 0.7,
       }),
     });
 
-    console.log('Response Status:', response.status); // للتdebug
-
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`DeepSeek API Error: ${response.status} - ${errorText}`);
+      throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    const responseText = data.choices[0].message.content;
     
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error("No response choices from DeepSeek API");
+    // محاولة parsing الـ JSON
+    try {
+      const questions = JSON.parse(responseText);
+      return Array.isArray(questions) ? questions : [questions];
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      throw new Error('Failed to parse questions from AI response');
     }
 
-    return data.choices[0].message.content;
-
   } catch (error) {
-    console.error('Error in sendMessageToDeepSeek:', error);
+    console.error('Error generating questions:', error);
     throw error;
   }
 };
