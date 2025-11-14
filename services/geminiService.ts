@@ -1,6 +1,5 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { Question, DifficultyLevel } from '../types';
-import { sendMessageToDeepSeek } from "./api";
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
@@ -12,17 +11,52 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 export const generateQuestions = async (count: number, existingSentences: string[], targetLanguage: string, difficulty: DifficultyLevel): Promise<Question[]> => {
+  if (!process.env.API_KEY) {
+    throw new Error("API_KEY environment variable not set");
+  }
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
   const prompt = `Please generate ${count} unique quiz questions for learners of German at the ${difficulty} level. For each question, provide a sentence in ${targetLanguage}, its correct German translation, and three specific types of incorrect German translations:
 1. Two incorrect translations that are very similar to the correct answer (e.g., with minor grammatical errors, different word order, or slightly wrong vocabulary).
 2. One incorrect translation that is more distinctly different in meaning but still a plausible distractor.
 Do not repeat any of the following ${targetLanguage} sentences: ${existingSentences.join(', ')}.
-Your response MUST be a valid JSON array of objects. Each object should have the following structure: { "targetLanguageSentence": string, "correctGermanTranslation": string, "incorrectGermanTranslations": string[] }. The 'incorrectGermanTranslations' array must contain exactly three strings. Do not include any text outside of the JSON array.`;
+The 'incorrectGermanTranslations' array must contain exactly three strings.`;
 
   try {
-    const responseText = await sendMessageToDeepSeek(prompt);
-    // Deepseek might wrap the JSON in ```json ... ```, so let's clean that up.
-    const cleanedJsonString = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    const jsonResponse = JSON.parse(cleanedJsonString);
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              targetLanguageSentence: {
+                type: Type.STRING,
+                description: `A sentence in ${targetLanguage}.`
+              },
+              correctGermanTranslation: {
+                type: Type.STRING,
+                description: "The correct German translation of the sentence."
+              },
+              incorrectGermanTranslations: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.STRING,
+                },
+                description: "An array of exactly three incorrect German translations."
+              },
+            },
+            required: ["targetLanguageSentence", "correctGermanTranslation", "incorrectGermanTranslations"],
+          },
+        },
+      }
+    });
+
+    const responseText = response.text;
+    const jsonResponse = JSON.parse(responseText.trim());
 
     if (!Array.isArray(jsonResponse)) {
       throw new Error("Invalid response format from API. Expected a JSON array.");
@@ -48,7 +82,7 @@ Your response MUST be a valid JSON array of objects. Each object should have the
     
     return questions;
   } catch (error) {
-    console.error("Error generating questions with DeepSeek:", error);
+    console.error("Error generating questions with Gemini:", error);
     throw new Error("Failed to generate questions. Please try again.");
   }
 };
