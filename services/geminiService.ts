@@ -1,5 +1,6 @@
-import { GoogleGenAI, Modality, Type } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 import { Question, DifficultyLevel } from '../types';
+import { sendMessageToDeepSeek } from './api';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
@@ -11,52 +12,37 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 export const generateQuestions = async (count: number, existingSentences: string[], targetLanguage: string, difficulty: DifficultyLevel): Promise<Question[]> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set");
-  }
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
   const prompt = `Please generate ${count} unique quiz questions for learners of German at the ${difficulty} level. For each question, provide a sentence in ${targetLanguage}, its correct German translation, and three specific types of incorrect German translations:
 1. Two incorrect translations that are very similar to the correct answer (e.g., with minor grammatical errors, different word order, or slightly wrong vocabulary).
 2. One incorrect translation that is more distinctly different in meaning but still a plausible distractor.
 Do not repeat any of the following ${targetLanguage} sentences: ${existingSentences.join(', ')}.
-The 'incorrectGermanTranslations' array must contain exactly three strings.`;
+Your response must be a JSON array of objects. Each object should have the following structure:
+{
+  "targetLanguageSentence": "...",
+  "correctGermanTranslation": "...",
+  "incorrectGermanTranslations": ["...", "...", "..."]
+}
+The 'incorrectGermanTranslations' array must contain exactly three strings.
+Do not include any explanatory text or markdown formatting outside of the JSON array itself.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              targetLanguageSentence: {
-                type: Type.STRING,
-                description: `A sentence in ${targetLanguage}.`
-              },
-              correctGermanTranslation: {
-                type: Type.STRING,
-                description: "The correct German translation of the sentence."
-              },
-              incorrectGermanTranslations: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.STRING,
-                },
-                description: "An array of exactly three incorrect German translations."
-              },
-            },
-            required: ["targetLanguageSentence", "correctGermanTranslation", "incorrectGermanTranslations"],
-          },
-        },
-      }
-    });
+    const responseText = await sendMessageToDeepSeek(prompt);
+    
+    // Extract JSON from potential markdown code block or surrounding text
+    const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
+    const match = responseText.match(jsonBlockRegex);
+    let jsonString = responseText;
+    if (match && match[1]) {
+        jsonString = match[1];
+    } else {
+        const firstBracket = jsonString.indexOf('[');
+        const lastBracket = jsonString.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1) {
+            jsonString = jsonString.substring(firstBracket, lastBracket + 1);
+        }
+    }
 
-    const responseText = response.text;
-    const jsonResponse = JSON.parse(responseText.trim());
+    const jsonResponse = JSON.parse(jsonString.trim());
 
     if (!Array.isArray(jsonResponse)) {
       throw new Error("Invalid response format from API. Expected a JSON array.");
@@ -82,38 +68,15 @@ The 'incorrectGermanTranslations' array must contain exactly three strings.`;
     
     return questions;
   } catch (error) {
-    console.error("Error generating questions with Gemini:", error);
+    console.error("Error generating questions with DeepSeek:", error);
     throw new Error("Failed to generate questions. Please try again.");
   }
 };
 
 export const generateSpeech = async (text: string): Promise<string> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set");
-  }
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Kore' },
-            },
-        },
-      },
-    });
-    
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!base64Audio) {
-      throw new Error("No audio data received from API.");
-    }
-    return base64Audio;
-  } catch (error) {
-    console.error("Error generating speech:", error);
-    throw new Error("Failed to generate speech.");
-  }
+  // DeepSeek is now used for question generation, which requires a DeepSeek API key.
+  // The Gemini TTS service requires a Google AI API key.
+  // Since the app now expects a DeepSeek key in the environment, we are disabling TTS to avoid API errors.
+  console.warn("Text-to-speech feature is disabled because the question generation now uses the DeepSeek API.");
+  throw new Error("Text-to-speech is not available with the current API configuration.");
 };
