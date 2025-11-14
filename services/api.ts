@@ -67,10 +67,10 @@ interface DeepSeekChatCompletionResponse {
  * @throws An error if the API key is missing or if the API call fails.
  */
 export const sendMessageToDeepSeek = async (message: string): Promise<string> => {
-  const apiKey = "sk-1fa9e391bb76492ab755ec0bb7ad378c";
+  const apiKey = process.env.API_KEY;
 
   if (!apiKey) {
-    throw new Error("DEEPSEEK_API_KEY environment variable not set.");
+    throw new Error("API_KEY environment variable not set.");
   }
 
   try {
@@ -85,7 +85,7 @@ export const sendMessageToDeepSeek = async (message: string): Promise<string> =>
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant.'
+            content: 'You are an expert in German and other languages, specializing in creating educational quiz content. You will be asked to generate quiz questions and your output must strictly follow the format requested by the user, especially when JSON is requested.'
           },
           {
             role: 'user',

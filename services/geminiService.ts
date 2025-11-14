@@ -1,5 +1,6 @@
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 import { Question, DifficultyLevel } from '../types';
+import { sendMessageToDeepSeek } from "./api";
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
@@ -11,55 +12,27 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 export const generateQuestions = async (count: number, existingSentences: string[], targetLanguage: string, difficulty: DifficultyLevel): Promise<Question[]> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set");
-  }
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
   const prompt = `Please generate ${count} unique quiz questions for learners of German at the ${difficulty} level. For each question, provide a sentence in ${targetLanguage}, its correct German translation, and three specific types of incorrect German translations:
 1. Two incorrect translations that are very similar to the correct answer (e.g., with minor grammatical errors, different word order, or slightly wrong vocabulary).
 2. One incorrect translation that is more distinctly different in meaning but still a plausible distractor.
-Do not repeat any of the following ${targetLanguage} sentences: ${existingSentences.join(', ')}.`;
+Do not repeat any of the following ${targetLanguage} sentences: ${existingSentences.join(', ')}.
+Your response MUST be a valid JSON array of objects. Each object should have the following structure: { "targetLanguageSentence": string, "correctGermanTranslation": string, "incorrectGermanTranslations": string[] }. The 'incorrectGermanTranslations' array must contain exactly three strings. Do not include any text outside of the JSON array.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        systemInstruction: `You are an expert in German and ${targetLanguage} linguistics, specializing in creating educational quiz content. Your task is to generate questions for a German language quiz for learners at the ${difficulty} level. For each question, you must provide: a sentence in ${targetLanguage}, its correct German translation, and exactly three incorrect German translations. Among the three incorrect translations, two should be semantically close or have subtle grammatical errors compared to the correct answer, making them challenging distractors. The third incorrect translation should be more different in meaning, testing broader comprehension. Ensure the final output is a valid JSON array where the 'incorrectGermanTranslations' array always contains exactly three strings based on this logic.`,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              targetLanguageSentence: {
-                type: Type.STRING,
-                description: `A sentence in ${targetLanguage}.`
-              },
-              correctGermanTranslation: {
-                type: Type.STRING,
-                description: "The correct German translation of the sentence."
-              },
-              incorrectGermanTranslations: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: "An array of three incorrect but plausible German translations, with two being very similar to the correct answer and one being distinctly different."
-              }
-            },
-            required: ["targetLanguageSentence", "correctGermanTranslation", "incorrectGermanTranslations"]
-          }
-        }
-      }
-    });
-
-    const jsonResponse = JSON.parse(response.text);
+    const responseText = await sendMessageToDeepSeek(prompt);
+    // Deepseek might wrap the JSON in ```json ... ```, so let's clean that up.
+    const cleanedJsonString = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const jsonResponse = JSON.parse(cleanedJsonString);
 
     if (!Array.isArray(jsonResponse)) {
-      throw new Error("Invalid response format from API.");
+      throw new Error("Invalid response format from API. Expected a JSON array.");
     }
 
     const questions: Question[] = jsonResponse.map((item: any, index: number) => {
+      if (!item.targetLanguageSentence || !item.correctGermanTranslation || !Array.isArray(item.incorrectGermanTranslations) || item.incorrectGermanTranslations.length !== 3) {
+        console.error(`Invalid question structure in API response for item at index ${index}:`, item);
+        return null;
+      }
       const options = shuffleArray([...item.incorrectGermanTranslations, item.correctGermanTranslation]);
       return {
         id: `${Date.now()}-${index}`,
@@ -67,11 +40,15 @@ Do not repeat any of the following ${targetLanguage} sentences: ${existingSenten
         options,
         correctAnswer: item.correctGermanTranslation,
       };
-    });
+    }).filter((q): q is Question => q !== null);
 
+    if (questions.length < count && jsonResponse.length > 0) {
+        console.warn(`API returned ${jsonResponse.length} items but only ${questions.length} were valid.`);
+    }
+    
     return questions;
   } catch (error) {
-    console.error("Error generating questions:", error);
+    console.error("Error generating questions with DeepSeek:", error);
     throw new Error("Failed to generate questions. Please try again.");
   }
 };
